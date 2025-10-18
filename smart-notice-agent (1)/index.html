@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notice Agent</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="auth-page active">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1 class="auth-title">Smart Notice Agent</h1>
+                <p class="auth-subtitle">Sign in to your account</p>
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                </form>
+                <p class="auth-link">Don't have an account? <a href="#" onclick="switchToSignup(event)">Create one</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signupPage" class="auth-page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1 class="auth-title">Smart Notice Agent</h1>
+                <p class="auth-subtitle">Create your account</p>
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+                <p class="auth-link">Already have an account? <a href="#" onclick="switchToLogin(event)">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="hamburger" id="hamburger">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="app-logo">Smart Notice Agent</h1>
+            </div>
+            <div class="header-right">
+                <a href="#" class="nav-link" onclick="navigateTo('dashboard', event)">Home</a>
+                <div class="notification-container">
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                </div>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="app-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard', event)">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="history" onclick="navigateTo('history', event)">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings" onclick="navigateTo('settings', event)">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page active">
+                    <div class="page-header">
+                        <h2>Dashboard</h2>
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            <i class="fas fa-plus"></i> Create New Notice
+                        </button>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="card summary-card">
+                            <div class="card-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-content">
+                                <p class="card-label">Pending Notices</p>
+                                <p class="card-value" id="pendingCount">0</p>
+                            </div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="card-icon completed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-content">
+                                <p class="card-label">Completed</p>
+                                <p class="card-value" id="completedCount">0</p>
+                            </div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="card-icon total">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="card-content">
+                                <p class="card-label">Total Notices</p>
+                                <p class="card-value" id="totalCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notices Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Pending Notices</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="notices-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Medium</th>
+                                        <th>Due Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingNoticesBody">
+                                    <tr class="empty-row">
+                                        <td colspan="5">No pending notices. Create one to get started!</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div id="historyPage" class="page">
+                    <div class="page-header">
+                        <h2>History</h2>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search completed notices...">
+                    </div>
+
+                    <!-- Analytics Section -->
+                    <div class="analytics-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Analytics</h3>
+                            </div>
+                            <div class="analytics-grid">
+                                <div class="analytics-item">
+                                    <p class="analytics-label">Total Completed</p>
+                                    <p class="analytics-value" id="totalCompleted">0</p>
+                                </div>
+                                <div class="analytics-item">
+                                    <p class="analytics-label">On-Time Completion</p>
+                                    <p class="analytics-value" id="onTimePercentage">0%</p>
+                                </div>
+                                <div class="analytics-item">
+                                    <p class="analytics-label">Completion Rate</p>
+                                    <p class="analytics-value" id="completionRate">0%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Notices Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Completed Notices</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="notices-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Medium</th>
+                                        <th>Due Date</th>
+                                        <th>Completed Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedNoticesBody">
+                                    <tr class="empty-row">
+                                        <td colspan="5">No completed notices yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settingsPage" class="page">
+                    <div class="page-header">
+                        <h2>Settings</h2>
+                    </div>
+
+                    <div class="settings-container">
+                        <!-- Connected Accounts Tab -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Connected Accounts</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="account-item">
+                                    <div class="account-info">
+                                        <i class="fab fa-whatsapp"></i>
+                                        <div>
+                                            <p class="account-name">WhatsApp</p>
+                                            <p class="account-status">Not connected</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary">Connect</button>
+                                </div>
+                                <div class="account-item">
+                                    <div class="account-info">
+                                        <i class="fas fa-envelope"></i>
+                                        <div>
+                                            <p class="account-name">Email</p>
+                                            <p class="account-status">Not connected</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary">Connect</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preferences Tab -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Preferences</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <p class="preference-label">Dark Mode</p>
+                                        <p class="preference-desc">Toggle dark/light theme</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="darkModeToggle">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <label for="notificationTone" class="preference-label">Notification Tone</label>
+                                    <select id="notificationTone" class="form-select">
+                                        <option>Default</option>
+                                        <option>Silent</option>
+                                        <option>Vibrate</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keywords Tab -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Keywords</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="keywords-input-group">
+                                    <input type="text" id="keywordInput" class="form-input" placeholder="Add a keyword...">
+                                    <button class="btn btn-primary" onclick="addKeyword()">Add</button>
+                                </div>
+                                <div class="keywords-list" id="keywordsList">
+                                    <!-- Keywords will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Create Notice Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Notice</h2>
+                <button class="modal-close" onclick="closeCreateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="createNoticeForm" class="modal-form">
+                <div class="form-group">
+                    <label for="noticeTitle">Title</label>
+                    <input type="text" id="noticeTitle" placeholder="Notice title" required>
+                </div>
+                <div class="form-group">
+                    <label for="noticeDescription">Description</label>
+                    <textarea id="noticeDescription" placeholder="Notice description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="noticeMedium">Target Medium</label>
+                    <select id="noticeMedium" required>
+                        <option value="">Select medium</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Email">Email</option>
+                        <option value="SMS">SMS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="noticeDeadline">Deadline</label>
+                    <input type="date" id="noticeDeadline" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Notice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Confirm Action</h2>
+            </div>
+            <p id="confirmMessage" class="modal-message"></p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
