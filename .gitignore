@@ -1,0 +1,3 @@
+email taker/credentials.json
+email taker/token.pickle
+email taker/smart_notice_email.py
