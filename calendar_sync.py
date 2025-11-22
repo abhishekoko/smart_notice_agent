@@ -5,6 +5,7 @@ from google.auth.transport.requests import Request
 import datetime
 import pickle
 import os
+import pytz
 import dateparser
 from dateparser.search import search_dates
 
@@ -46,18 +47,21 @@ def find_existing_event(service, mongo_id):
 
 
 def create_or_update_event(service, title, desc, date, mongo_id, time_str=None):
-    """Create event with time if available, otherwise all-day."""
+    """Create event with proper timezone-aware datetimes."""
+    
+    india = pytz.timezone("Asia/Kolkata")
+
     if time_str:
-        # Parse the detected time
+        # Parse event time safely
         try:
             event_time = datetime.datetime.strptime(time_str, "%I:%M %p").time()
         except:
             try:
                 event_time = datetime.datetime.strptime(time_str, "%H:%M").time()
             except:
-                event_time = datetime.time(9, 0)
+                event_time = datetime.time(9, 0)  # default 9 AM
 
-        start_dt = datetime.datetime.combine(date, event_time)
+        start_dt = india.localize(datetime.datetime.combine(date, event_time))
         end_dt = start_dt + datetime.timedelta(hours=1)
 
         body = {
@@ -67,6 +71,7 @@ def create_or_update_event(service, title, desc, date, mongo_id, time_str=None):
             "end": {"dateTime": end_dt.isoformat(), "timeZone": "Asia/Kolkata"},
             "extendedProperties": {"private": {"mongoId": mongo_id}},
         }
+
     else:
         # All-day event
         body = {
@@ -77,11 +82,10 @@ def create_or_update_event(service, title, desc, date, mongo_id, time_str=None):
             "extendedProperties": {"private": {"mongoId": mongo_id}},
         }
 
-    # Update or create
+    # Update or create event
     existing = find_existing_event(service, mongo_id)
     if existing:
         service.events().update(calendarId="primary", eventId=existing["id"], body=body).execute()
-        
     else:
         service.events().insert(calendarId="primary", body=body).execute()
         print(f"✅ Created event: {title}")
@@ -105,20 +109,20 @@ def run_calendar_sync():
         if not fallback_due_date:
             continue
 
-        # ✅ Extract date & time from notice text
+        # Extract date/time from text
         extracted = search_dates(desc, settings={"PREFER_DATES_FROM": "future"})
         parsed_date = None
         parsed_time = None
 
         if extracted:
             for _, dt in extracted:
-                if dt.date() >= datetime.date.today():  # ignore past dates
+                if dt.date() >= datetime.date.today():
                     parsed_date = dt.date()
                     if dt.time() != datetime.time(0, 0):
                         parsed_time = dt.strftime("%H:%M")
                     break
 
-        # ✅ If no date detected → fallback to DB dueDate
+        # Fallback to dueDate from DB
         if parsed_date:
             date = parsed_date
         else:
@@ -127,10 +131,9 @@ def run_calendar_sync():
             except:
                 continue
 
-        # ✅ Detect stored or extracted time
         time_str = notice.get("time") or notice.get("startTime") or parsed_time
 
-        # ✅ Only sync important notices
+        # Only sync important notices
         if any(k in title or k in desc for k in KEYWORDS):
             create_or_update_event(service, title.title(), desc, date, mongo_id, time_str)
 
