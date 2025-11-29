@@ -1,4 +1,4 @@
-# backend/routes/auth_routes.py
+# backend/routes/auth_routes.py (updated)
 from flask import Blueprint, request, jsonify
 from backend.models.user_model import create_user, get_user_by_email, verify_password
 
@@ -48,3 +48,4 @@ def login():
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
