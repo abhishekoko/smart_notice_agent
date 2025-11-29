@@ -1,4 +1,4 @@
-# backend/routes/notice_routes.py
+# backend/routes/notice_routes.py (updated)
 from flask import Blueprint, request, jsonify
 from backend.models.notice_model import create_notice, get_all_notices, delete_notice, mark_notice_completed
 from backend.utils.summarizer import TransformerSummarizer
@@ -50,3 +50,4 @@ def complete_notice_route(notice_id):
         return jsonify({"error": "Notice not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
