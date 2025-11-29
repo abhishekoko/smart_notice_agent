@@ -1,4 +1,4 @@
-# backend/models/user_model.py
+# backend/models/user_model.py ((updated))
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.config import db
@@ -24,3 +24,4 @@ def get_user_by_email(email):
 
 def verify_password(stored_password, provided_password):
     return check_password_hash(stored_password, provided_password)
+
