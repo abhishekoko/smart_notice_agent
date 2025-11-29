@@ -1,4 +1,4 @@
-# backend/models/notice_model.py
+# backend/models/notice_model.py (updated)
 from datetime import datetime
 from backend.config import db
 
@@ -37,3 +37,4 @@ def mark_notice_completed(notice_id):
         {"$set": {"status": "completed", "completedDate": datetime.utcnow().strftime("%Y-%m-%d")}}
     )
     return res.modified_count
+
