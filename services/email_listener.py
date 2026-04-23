@@ -8,8 +8,7 @@ from backend.utils.summarizer import TransformerSummarizer
 
 IMAP_HOST = "imap.gmail.com"
 IMAP_PORT = 993
-IMAP_USER = "abhishek73197319@gmail.com"
-IMAP_PASSWORD = "pqhw ozvy uxwd thme"
+
 POLL_INTERVAL = 30  # seconds
 
 notice_collection = db["notices"]
