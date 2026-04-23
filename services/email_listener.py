@@ -6,8 +6,6 @@ from datetime import datetime
 from backend.config import db
 from backend.utils.summarizer import TransformerSummarizer
 
-IMAP_HOST = "imap.gmail.com"
-IMAP_PORT = 993
 
 POLL_INTERVAL = 30  # seconds
 
